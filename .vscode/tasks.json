@@ -1,0 +1,63 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-ios-simulator",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/MyiOSApp/MyiOSApp.csproj",
+        "-f",
+        "net8.0-ios",
+        "-c",
+        "Debug"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-ios-device",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/MyiOSApp/MyiOSApp.csproj",
+        "-f",
+        "net8.0-ios",
+        "-c",
+        "Debug",
+        "-p:RuntimeIdentifier=ios-arm64"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "run-ios-simulator",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "-t:Run",
+        "${workspaceFolder}/MyiOSApp/MyiOSApp.csproj",
+        "-f",
+        "net8.0-ios"
+      ],
+      "problemMatcher": "$msCompile",
+      "dependsOn": "build-ios-simulator"
+    },
+    {
+      "label": "run-ios-device",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "-t:Run",
+        "${workspaceFolder}/MyiOSApp/MyiOSApp.csproj",
+        "-f",
+        "net8.0-ios",
+        "-p:RuntimeIdentifier=ios-arm64"
+      ],
+      "problemMatcher": "$msCompile",
+      "dependsOn": "build-ios-device"
+    }
+  ]
+}

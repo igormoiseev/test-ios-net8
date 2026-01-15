@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run on iOS Simulator",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "run-ios-simulator",
+      "program": "${workspaceFolder}/MyiOSApp/bin/Debug/net8.0-ios/iossimulator-arm64/MyiOSApp.dll",
+      "cwd": "${workspaceFolder}/MyiOSApp",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Run on iPad/iPhone Device",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "run-ios-device",
+      "program": "${workspaceFolder}/MyiOSApp/bin/Debug/net8.0-ios/ios-arm64/MyiOSApp.dll",
+      "cwd": "${workspaceFolder}/MyiOSApp",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ]
+}

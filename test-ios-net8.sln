@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyiOSApp", "MyiOSApp\MyiOSApp.csproj", "{6322CCAE-5A25-C380-77EC-14CE94C3A381}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyiOSApp.Core", "MyiOSApp.Core\MyiOSApp.Core.csproj", "{B68CCED4-6A76-4FEF-8EEC-A5BE56484E39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6322CCAE-5A25-C380-77EC-14CE94C3A381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6322CCAE-5A25-C380-77EC-14CE94C3A381}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6322CCAE-5A25-C380-77EC-14CE94C3A381}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6322CCAE-5A25-C380-77EC-14CE94C3A381}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B68CCED4-6A76-4FEF-8EEC-A5BE56484E39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B68CCED4-6A76-4FEF-8EEC-A5BE56484E39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B68CCED4-6A76-4FEF-8EEC-A5BE56484E39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B68CCED4-6A76-4FEF-8EEC-A5BE56484E39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {80FF5840-9CFB-43E8-A4F2-7A46CBD87C44}
+	EndGlobalSection
+EndGlobal

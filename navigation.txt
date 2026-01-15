@@ -1,0 +1,281 @@
+I'll explain how navigation works in MvvmCross 9.3 with async navigation, parameters, and return values.
+MvvmCross 9.3 Navigation Overview
+MvvmCross uses IMvxNavigationService for navigation. Here's how to implement navigation with parameters and return values:
+1. Basic Setup - Inject Navigation Service
+
+public class FirstViewModel : MvxViewModel
+{
+    private readonly IMvxNavigationService _navigationService;
+
+    public FirstViewModel(IMvxNavigationService navigationService)
+    {
+        _navigationService = navigationService;
+    }
+}
+2. Navigate to a Page with a Parameter
+Source ViewModel (FirstViewModel):
+
+public class FirstViewModel : MvxViewModel
+{
+    private readonly IMvxNavigationService _navigationService;
+
+    public FirstViewModel(IMvxNavigationService navigationService)
+    {
+        _navigationService = navigationService;
+    }
+
+    public async Task NavigateToSecondPage()
+    {
+        // Navigate with a parameter
+        var parameter = new SecondParameter 
+        { 
+            UserId = 123, 
+            UserName = "John Doe" 
+        };
+        
+        await _navigationService.Navigate<SecondViewModel, SecondParameter>(parameter);
+    }
+}
+Target ViewModel (SecondViewModel):
+
+public class SecondViewModel : MvxViewModel<SecondParameter>
+{
+    private SecondParameter _parameter;
+
+    public override void Prepare(SecondParameter parameter)
+    {
+        // Receive the parameter here
+        _parameter = parameter;
+        UserId = parameter.UserId;
+        UserName = parameter.UserName;
+    }
+}
+
+public class SecondParameter
+{
+    public int UserId { get; set; }
+    public string UserName { get; set; }
+}
+3. Navigate with Parameter AND Return Value
+Source ViewModel (FirstViewModel):
+
+public class FirstViewModel : MvxViewModel
+{
+    private readonly IMvxNavigationService _navigationService;
+
+    public FirstViewModel(IMvxNavigationService navigationService)
+    {
+        _navigationService = navigationService;
+    }
+
+    public async Task NavigateAndGetResult()
+    {
+        // Navigate with parameter and await the result
+        var parameter = new SecondParameter 
+        { 
+            UserId = 123, 
+            UserName = "John Doe" 
+        };
+        
+        // This will wait until SecondViewModel closes and returns a result
+        var result = await _navigationService
+            .Navigate<SecondViewModel, SecondParameter, SecondResult>(parameter);
+        
+        if (result != null)
+        {
+            // Handle the returned result
+            Console.WriteLine($"User selected: {result.SelectedValue}");
+            Console.WriteLine($"Was confirmed: {result.IsConfirmed}");
+        }
+    }
+}
+Target ViewModel (SecondViewModel):
+
+public class SecondViewModel : MvxViewModel<SecondParameter, SecondResult>
+{
+    private readonly IMvxNavigationService _navigationService;
+    private SecondParameter _parameter;
+
+    public SecondViewModel(IMvxNavigationService navigationService)
+    {
+        _navigationService = navigationService;
+    }
+
+    public override void Prepare(SecondParameter parameter)
+    {
+        // Receive the parameter
+        _parameter = parameter;
+        UserId = parameter.UserId;
+        UserName = parameter.UserName;
+    }
+
+    public async Task CloseWithResult()
+    {
+        // Create the result to return
+        var result = new SecondResult
+        {
+            SelectedValue = "Some value",
+            IsConfirmed = true
+        };
+
+        // Close and return the result
+        await _navigationService.Close(this, result);
+    }
+
+    public async Task Cancel()
+    {
+        // Close without a result (returns null)
+        await _navigationService.Close(this);
+    }
+}
+
+// Parameter model
+public class SecondParameter
+{
+    public int UserId { get; set; }
+    public string UserName { get; set; }
+}
+
+// Result model
+public class SecondResult
+{
+    public string SelectedValue { get; set; }
+    public bool IsConfirmed { get; set; }
+}
+4. Different Navigation Patterns
+Navigate without parameters:
+
+await _navigationService.Navigate<SecondViewModel>();
+Navigate with only a parameter (no return):
+
+await _navigationService.Navigate<SecondViewModel, SecondParameter>(parameter);
+Navigate with parameter and return value:
+
+var result = await _navigationService
+    .Navigate<SecondViewModel, SecondParameter, SecondResult>(parameter);
+Navigate with only return value (no parameter):
+
+var result = await _navigationService.Navigate<SecondViewModel, SecondResult>();
+5. Complete Example for iOS
+FirstViewModel.cs:
+
+using MvvmCross.Commands;
+using MvvmCross.Navigation;
+using MvvmCross.ViewModels;
+
+public class FirstViewModel : MvxViewModel
+{
+    private readonly IMvxNavigationService _navigationService;
+    private string _resultMessage;
+
+    public FirstViewModel(IMvxNavigationService navigationService)
+    {
+        _navigationService = navigationService;
+        NavigateCommand = new MvxAsyncCommand(NavigateToDetail);
+    }
+
+    public IMvxAsyncCommand NavigateCommand { get; }
+
+    public string ResultMessage
+    {
+        get => _resultMessage;
+        set => SetProperty(ref _resultMessage, value);
+    }
+
+    private async Task NavigateToDetail()
+    {
+        var param = new DetailParameter { Title = "Edit Item", ItemId = 42 };
+        
+        var result = await _navigationService
+            .Navigate<DetailViewModel, DetailParameter, DetailResult>(param);
+
+        if (result != null && result.IsSuccess)
+        {
+            ResultMessage = $"Saved: {result.SavedValue}";
+        }
+        else
+        {
+            ResultMessage = "Cancelled";
+        }
+    }
+}
+DetailViewModel.cs:
+
+using MvvmCross.Commands;
+using MvvmCross.Navigation;
+using MvvmCross.ViewModels;
+
+public class DetailViewModel : MvxViewModel<DetailParameter, DetailResult>
+{
+    private readonly IMvxNavigationService _navigationService;
+    private string _title;
+    private string _inputValue;
+
+    public DetailViewModel(IMvxNavigationService navigationService)
+    {
+        _navigationService = navigationService;
+        SaveCommand = new MvxAsyncCommand(Save);
+        CancelCommand = new MvxAsyncCommand(Cancel);
+    }
+
+    public IMvxAsyncCommand SaveCommand { get; }
+    public IMvxAsyncCommand CancelCommand { get; }
+
+    public string Title
+    {
+        get => _title;
+        set => SetProperty(ref _title, value);
+    }
+
+    public string InputValue
+    {
+        get => _inputValue;
+        set => SetProperty(ref _inputValue, value);
+    }
+
+    public override void Prepare(DetailParameter parameter)
+    {
+        Title = parameter.Title;
+        // Load data based on parameter.ItemId
+    }
+
+    private async Task Save()
+    {
+        var result = new DetailResult
+        {
+            IsSuccess = true,
+            SavedValue = InputValue
+        };
+
+        await _navigationService.Close(this, result);
+    }
+
+    private async Task Cancel()
+    {
+        var result = new DetailResult { IsSuccess = false };
+        await _navigationService.Close(this, result);
+    }
+}
+
+public class DetailParameter
+{
+    public string Title { get; set; }
+    public int ItemId { get; set; }
+}
+
+public class DetailResult
+{
+    public bool IsSuccess { get; set; }
+    public string SavedValue { get; set; }
+}
+Key Points:
+Generic Types: Use MvxViewModel<TParameter> for navigation with parameter, or MvxViewModel<TParameter, TResult> for navigation with both parameter and result
+Prepare Method: Override Prepare(TParameter parameter) to receive navigation parameters
+Close with Result: Call _navigationService.Close(this, result) to close and return a value
+Async/Await: All navigation is async, so the calling ViewModel waits until the target ViewModel closes
+Null Results: If the user navigates back without calling Close with a result, the result will be null
+This pattern works perfectly for scenarios like:
+Selecting an item from a list
+Editing data and confirming/canceling
+Multi-step forms with back navigation
+Any scenario where you need to get user input from another screen
